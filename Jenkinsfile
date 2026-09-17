@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'control-built-in'
+    }
 
     stages {
 
