@@ -15,8 +15,8 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying website..."
-                    echo "Running as user:"
-                    whoami
+                    echo "Running as user: $(whoami)"
+                    echo "Hostname: $(hostname)"
 
                     rm -rf /var/www/html/*
                     cp index.html /var/www/html/
