@@ -15,6 +15,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying website..."
+                    echo "whoami"
 
                     rm -rf /var/www/html/*
                     cp index.html /var/www/html/
