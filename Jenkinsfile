@@ -15,7 +15,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying website..."
-                    echo "whoami"
+                    echo "Running as user:" whoami
 
                     rm -rf /var/www/html/*
                     cp index.html /var/www/html/
