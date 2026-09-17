@@ -91,36 +91,121 @@ Nginx
 Website
 ```
 
-## Important future step: deploy to another server
+## Future Jenkins Agent story
 
-If the website is moved to another VM, for example:
+This is where the Jenkins Agent story becomes interesting.
 
-```text
-Jenkins Controller: 192.168.50.128
-Web Server:         192.168.50.131
-```
+### Stage 1: Everything on the Controller
 
-The controller's `/var/www/html` ownership no longer controls the remote server.
-
-A later deployment design can be:
+For the first demo, Jenkins and Nginx run on the same controller:
 
 ```text
 GitHub
    |
    v
-Webhook -> Jenkins Controller (.128)
-              |
-              | SSH / SCP
-              v
-        Web Server (.131)
-              |
-              v
-        /var/www/html
-              |
-              v
-            Nginx
+Webhook
+   |
+   v
+Jenkins Controller (.128)
+   |
+   v
+Nginx Website (.128)
 ```
 
-In that setup, Jenkins needs SSH access to `.131`, and the remote web directory must be writable by the account used for deployment (or deployment must use a controlled privilege-escalation method).
+The pipeline runs on the built-in/controller node as the `jenkins` Linux user.
 
-Do not introduce the remote server for the first webhook demo. Keep Jenkins + Nginx on `.128` first, then move execution/deployment to separate nodes in later videos.
+### Stage 2: Separate Web Server
+
+If the website is moved to another VM, for example `.131`, Jenkins can deploy to it over SSH/SCP:
+
+```text
+GitHub
+   |
+   v
+Webhook
+   |
+   v
+Jenkins Controller (.128)
+   |
+   | SSH / SCP
+   v
+Web Server (.131)
+   |
+   v
+Nginx
+```
+
+Jenkins then needs SSH access to `.131`, and the remote web directory must be writable by the deployment account or use a controlled privilege-escalation method.
+
+### Stage 3: Static Jenkins Agent
+
+Next, move pipeline execution from the controller to a dedicated static agent, for example `.129`:
+
+```text
+GitHub
+   |
+   v
+Webhook
+   |
+   v
+Jenkins Controller (.128)
+   |
+   | SSH
+   v
+Static Jenkins Agent (.129)
+   |
+   | deployment
+   v
+Web Server (.131)
+```
+
+The important concept is that the Jenkins controller receives the webhook and coordinates the job, while the agent executes the pipeline workload.
+
+For example:
+
+```text
+Controller:
+whoami -> jenkins
+
+Static Agent:
+whoami -> rohit
+```
+
+### Stage 4: Docker Plugin
+
+After understanding static agents, introduce dynamic execution with the Jenkins Docker Plugin:
+
+```text
+GitHub
+   |
+   v
+Webhook
+   |
+   v
+Jenkins Controller (.128)
+   |
+   | Docker Plugin
+   v
+Docker Host (.130)
+   |
+   v
+Temporary Jenkins Agent Container
+   |
+   v
+Pipeline execution
+```
+
+This progression demonstrates why Jenkins agents are useful instead of immediately introducing them before viewers understand the basic webhook-driven deployment.
+
+## Important learning sequence
+
+```text
+1. Jenkins Pipeline on Controller
+2. GitHub Webhook triggers Jenkins
+3. Jenkins deploys website on Controller
+4. Separate Web Server
+5. Static SSH Agent
+6. Docker Agent / Docker Plugin
+```
+
+Do not introduce the remote server or agents for the first webhook demo. Keep Jenkins + Nginx on `.128` first, then evolve the architecture in later videos.
