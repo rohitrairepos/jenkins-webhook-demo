@@ -2,6 +2,9 @@ pipeline {
     agent {
         label 'control-built-in'
     }
+      options {
+        skipDefaultCheckout(true)
+    }
 
     stages {
 
