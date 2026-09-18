@@ -43,10 +43,40 @@ pipeline {
     post {
         success {
             echo 'Website deployment successful!'
+
+            slackSend(
+                color: 'good',
+                message: """
+✅ Jenkins Build SUCCESS
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+Status: ${currentBuild.currentResult}
+
+Website deployment completed successfully.
+
+Build URL: ${env.BUILD_URL}
+"""
+            )
         }
 
         failure {
             echo 'Website deployment failed!'
+
+            slackSend(
+                color: 'danger',
+                message: """
+❌ Jenkins Build FAILED
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+Status: ${currentBuild.currentResult}
+
+Website deployment failed.
+
+Build URL: ${env.BUILD_URL}
+"""
+            )
         }
     }
 }
