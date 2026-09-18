@@ -45,6 +45,7 @@ pipeline {
             echo 'Website deployment successful!'
 
             slackSend(
+                channel: '#jenkins-builds',
                 color: 'good',
                 message: """
 ✅ Jenkins Build SUCCESS
@@ -57,15 +58,16 @@ Website deployment completed successfully.
 
 Build URL: ${env.BUILD_URL}
 """,
-        tokenCredentialId: 'slack-token',
-        botUser: true
-    )
-}
+                tokenCredentialId: 'slack-token',
+                botUser: true
+            )
+        }
 
         failure {
             echo 'Website deployment failed!'
 
             slackSend(
+                channel: '#jenkins-builds',
                 color: 'danger',
                 message: """
 ❌ Jenkins Build FAILED
@@ -78,8 +80,8 @@ Website deployment failed.
 
 Build URL: ${env.BUILD_URL}
 """,
-      tokenCredentialId: 'slack-token',
-      botUser: true
+                tokenCredentialId: 'slack-token',
+                botUser: true
             )
         }
     }
