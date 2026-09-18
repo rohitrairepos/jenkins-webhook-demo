@@ -56,9 +56,11 @@ Status: ${currentBuild.currentResult}
 Website deployment completed successfully.
 
 Build URL: ${env.BUILD_URL}
-"""
-            )
-        }
+""",
+        tokenCredentialId: 'slack-token',
+        botUser: true
+    )
+}
 
         failure {
             echo 'Website deployment failed!'
@@ -75,7 +77,9 @@ Status: ${currentBuild.currentResult}
 Website deployment failed.
 
 Build URL: ${env.BUILD_URL}
-"""
+""",
+      tokenCredentialId: 'slack-token',
+      botUser: true
             )
         }
     }
