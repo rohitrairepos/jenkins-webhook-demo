@@ -11,6 +11,19 @@ pipeline {
             }
         }
 
+        stage('Get Server IP') {
+            steps {
+                script {
+                    env.SERVER_IP = sh(
+                        script: "hostname -I | awk '{print \$1}'",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Server IP: ${env.SERVER_IP}"
+                }
+            }
+        }
+
         stage('Deploy Website') {
             steps {
                 sh '''
@@ -56,7 +69,11 @@ Status: ${currentBuild.currentResult}
 
 Website deployment completed successfully.
 
-Build URL: ${env.BUILD_URL}
+🌐 Website URL:
+http://${env.SERVER_IP}:80
+
+🔗 Jenkins Build:
+${env.BUILD_URL}
 """,
                 tokenCredentialId: 'slack-token',
                 botUser: true
@@ -78,7 +95,11 @@ Status: ${currentBuild.currentResult}
 
 Website deployment failed.
 
-Build URL: ${env.BUILD_URL}
+🌐 Server:
+http://${env.SERVER_IP}:80
+
+🔗 Jenkins Build:
+${env.BUILD_URL}
 """,
                 tokenCredentialId: 'slack-token',
                 botUser: true
